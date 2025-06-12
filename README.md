@@ -18,12 +18,17 @@
     <sup>1</sup>Fudan University&emsp; <sup>2</sup>Baidu Inc&emsp; <sup>3</sup>Nanjing University
 </div>
 
+<div align='Center'>
+<i><strong><a href='https://iclr.cc/Conferences/2025' target='_blank'>ICLR 2025</a></strong></i>
+</div>
+
 <br>
 <div align='center'>
     <a href='https://github.com/fudan-generative-vision/hallo2'><img src='https://img.shields.io/github/stars/fudan-generative-vision/hallo2?style=social'></a>
     <a href='https://fudan-generative-vision.github.io/hallo2/#/'><img src='https://img.shields.io/badge/Project-HomePage-Green'></a>
     <a href='https://arxiv.org/abs/2410.07718'><img src='https://img.shields.io/badge/Paper-Arxiv-red'></a>
     <a href='https://huggingface.co/fudan-generative-ai/hallo2'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20HuggingFace-Model-yellow'></a>
+    <a href='https://openbayes.com/console/public/tutorials/8KOlYWsdiY4'><img src='https://img.shields.io/badge/Demo-OpenBayes贝式计算-orange'></a>
     <a href='assets/wechat.jpeg'><img src='https://badges.aleen42.com/src/wechat.svg'></a>
 </div>
 <br>
@@ -53,6 +58,7 @@ Visit our [project page](https://fudan-generative-vision.github.io/hallo2/#/) to
 
 ## 📰 News
 
+- **`2025/01/23`**: 🎉🎉🎉 Our paper has been accepted to [ICLR 2025](https://iclr.cc/Conferences/2025).
 - **`2024/10/16`**: ✨✨✨ Source code and pretrained weights released.
 - **`2024/10/10`**: 🎉🎉🎉 Paper submitted on [Arxiv](https://arxiv.org/abs/2410.07718).
 
@@ -72,6 +78,13 @@ Visit our [project page](https://fudan-generative-vision.github.io/hallo2/#/) to
 
 - System requirement: Ubuntu 20.04/Ubuntu 22.04, Cuda 11.8
 - Tested GPUs: A100
+
+Download the codes:
+
+```bash
+  git clone https://github.com/fudan-generative-vision/hallo2
+  cd hallo2
+```
 
 Create conda environment:
 
@@ -97,11 +110,12 @@ Besides, ffmpeg is also needed:
 
 You can easily get all pretrained models required by inference from our [HuggingFace repo](https://huggingface.co/fudan-generative-ai/hallo2).
 
-Clone the pretrained models into `${PROJECT_ROOT}/pretrained_models` directory by cmd below:
+Using `huggingface-cli` to download the models:
 
 ```shell
-git lfs install
-git clone https://huggingface.co/fudan-generative-ai/hallo2 pretrained_models
+cd $ProjectRootDir
+pip install huggingface_hub
+huggingface-cli download fudan-generative-ai/hallo2 --local-dir ./pretrained_models
 ```
 
 Or you can download them separately from their source repo:
@@ -262,7 +276,7 @@ options:
 
 > NOTICE: The High-Resolution animation feature is a modified version of [CodeFormer](https://github.com/sczhou/CodeFormer). When using or redistributing this feature, please comply with the [S-Lab License 1.0](https://github.com/sczhou/CodeFormer?tab=License-1-ov-file). We kindly request that you respect the terms of this license in any usage or redistribution of this component.
 
-## Training
+## &#x1F525;Training
 
 ### Long-Duration animation
 
