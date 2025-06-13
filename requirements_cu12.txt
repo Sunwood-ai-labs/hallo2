@@ -32,4 +32,4 @@ pre-commit==3.7.1
 gradio==4.36.1
 lpips
 ffmpeg-python==0.2.0
-
+huggingface_hub==0.20.3

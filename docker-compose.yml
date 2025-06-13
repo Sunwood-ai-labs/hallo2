@@ -6,6 +6,8 @@ services:
       dockerfile: Dockerfile.cu12
     volumes:
       - .:/app
+      - ./.cache:/root/.cache
+      
     # command: python scripts/inference_long.py --config ./configs/inference/long.yaml
     tty: true
     deploy:
