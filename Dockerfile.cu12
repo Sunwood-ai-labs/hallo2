@@ -2,7 +2,7 @@ FROM pytorch/pytorch:2.2.2-cuda12.1-cudnn8-runtime
 
 WORKDIR /app
 
-# システムの依存関係をインストール
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
     libgl1-mesa-glx \
@@ -13,23 +13,20 @@ RUN apt-get update && apt-get install -y \
     libxrender-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# condaを使用してffmpegとx264をインストール
+# Install ffmpeg and x264 using conda
 RUN conda install -y conda=24.9.2
 RUN conda install -y -c conda-forge ffmpeg x264
 
-# pipとsetuptoolsを更新
+# Update pip and setuptools
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
-# Pythonの依存関係をインストール
+# Install Python dependencies
 COPY requirements_cu12.txt .
-RUN pip install --no-cache-dir -r requirements_cu12.txt
-RUN pip install opencv-python opencv-contrib-python
-RUN pip install --upgrade huggingface_hub diffusers opencv-python
-# OpenCV-Pythonをヘッドレスバージョンで再インストール
-RUN pip uninstall -y opencv-python && pip install --no-cache-dir opencv-python-headless
+RUN pip install -r requirements_cu12.txt --force-reinstall
+RUN pip install huggingface_hub==0.20.3
 
-# プロジェクトファイルをコピー
+# Copy project files
 COPY . .
 
-# 実行時のコマンドを指定
+# Specify runtime command
 # CMD ["python", "scripts/inference_long.py", "--config", "./configs/inference/long.yaml"]
