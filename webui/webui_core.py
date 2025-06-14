@@ -91,9 +91,13 @@ class Hallo2WebUI:
             
             progress(0.1, desc="初期化中...")
             
+            # 一意の一時ファイル名を生成
+            import uuid
+            unique_id = str(uuid.uuid4())[:8]
+            
             # 一時ファイルの作成
-            image_path = os.path.join(self.temp_dir, "source_image.jpg")
-            audio_path = os.path.join(self.temp_dir, "driving_audio.wav")
+            image_path = os.path.join(self.temp_dir, f"source_image_{unique_id}.jpg")
+            audio_path = os.path.join(self.temp_dir, f"driving_audio_{unique_id}.wav")
             
             # ファイルのコピー
             if hasattr(source_image, 'name'):
@@ -105,6 +109,8 @@ class Hallo2WebUI:
                 shutil.copy2(driving_audio.name, audio_path)
             else:
                 shutil.copy2(driving_audio, audio_path)
+            
+            logger.info(f"一時ファイルを作成: 画像={image_path}, 音声={audio_path}")
             
             progress(0.2, desc="設定を準備中...")
             
@@ -122,25 +128,39 @@ class Hallo2WebUI:
             progress(0.3, desc="推論処理を開始...")
             
             # 推論実行
+            logger.info(f"推論処理を開始: 画像={image_path}, 音声={audio_path}")
             save_seg_path = inference_process(args)
+            logger.info(f"推論処理完了: セグメント保存先={save_seg_path}")
             
             progress(0.8, desc="動画を結合中...")
             
             # 生成された動画を結合
             output_video_path = os.path.join(self.temp_dir, "generated_video.mp4")
-            video_segments = []
             
             # セグメント動画ディレクトリが存在し、動画ファイルがある場合
             if os.path.exists(save_seg_path):
                 video_files = [f for f in os.listdir(save_seg_path) if f.endswith('.mp4')]
                 if video_files:
-                    # 動画を結合（merge_videosは2つの引数のみ受け取る）
-                    merge_videos_from_dir(save_seg_path, output_video_path)
+                    logger.info(f"セグメント動画ディレクトリ: {save_seg_path}")
+                    logger.info(f"見つかった動画ファイル: {video_files}")
+                    
+                    # 動画ファイルが1つの場合は直接コピー
+                    if len(video_files) == 1:
+                        single_video_path = os.path.join(save_seg_path, video_files[0])
+                        shutil.copy2(single_video_path, output_video_path)
+                        logger.info(f"単一の動画ファイルをコピー: {single_video_path} -> {output_video_path}")
+                    else:
+                        # 複数の動画ファイルを結合
+                        merge_videos_from_dir(save_seg_path, output_video_path)
+                        logger.info(f"複数の動画ファイルを結合: {len(video_files)}個のファイル")
+                    
                     progress(1.0, desc="完了!")
                     return output_video_path, "✅ 顔アニメーションの生成が完了しました。"
                 else:
+                    logger.error(f"セグメント動画ディレクトリに動画ファイルが見つかりません: {save_seg_path}")
                     return None, "❌ 生成された動画ファイルが見つかりません。"
             else:
+                logger.error(f"セグメント動画ディレクトリが存在しません: {save_seg_path}")
                 return None, "❌ 動画の生成に失敗しました。"
                 
         except Exception as e:
@@ -245,7 +265,8 @@ class Hallo2WebUI:
         # Gradio 4.36.1互換の構文を使用
         interface = gr.Blocks(
             title="Hallo2 - 音声駆動顔アニメーション",
-            css=css
+            css=css,
+            theme='JohnSmith9982/small_and_pretty'
         )
         
         with interface:

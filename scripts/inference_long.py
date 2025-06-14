@@ -178,14 +178,25 @@ def inference_process(args: argparse.Namespace):
     source_image_path = config.source_image
     driving_audio_path = config.driving_audio
 
-    save_path = os.path.join(config.save_path, Path(source_image_path).stem)
+    # 一意のディレクトリ名を生成（タイムスタンプ付き）
+    import datetime
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    image_stem = Path(source_image_path).stem
+    unique_dir_name = f"{image_stem}_{timestamp}"
+    
+    save_path = os.path.join(config.save_path, unique_dir_name)
     save_seg_path = os.path.join(save_path, "seg_video")
     print("save path: ", save_path)
     
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
-    if not os.path.exists(save_seg_path):
-        os.makedirs(save_seg_path)
+    # 既存のディレクトリがある場合は削除してから作成（クリーンな状態を保証）
+    if os.path.exists(save_path):
+        import shutil
+        shutil.rmtree(save_path)
+        print(f"既存のディレクトリを削除: {save_path}")
+    
+    os.makedirs(save_path)
+    os.makedirs(save_seg_path)
+    print(f"新しいディレクトリを作成: {save_path}")
 
     motion_scale = [config.pose_weight, config.face_weight, config.lip_weight]
 
