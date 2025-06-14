@@ -232,9 +232,14 @@ class Hallo2WebUI:
         css = """
         .gradio-container {
             max-width: 1200px !important;
+            margin: 0 auto !important;
+            padding: 20px !important;
         }
         .tab-nav {
             font-size: 16px;
+        }
+        .block {
+            border-radius: 8px;
         }
         """
         
