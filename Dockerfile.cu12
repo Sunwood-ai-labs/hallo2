@@ -2,7 +2,7 @@ FROM pytorch/pytorch:2.2.2-cuda12.1-cudnn8-runtime
 
 WORKDIR /app
 
-# Install system dependencies
+# システム依存関係
 RUN apt-get update && apt-get install -y \
     git \
     libgl1-mesa-glx \
@@ -11,22 +11,35 @@ RUN apt-get update && apt-get install -y \
     libsm6 \
     libxext6 \
     libxrender-dev \
+    curl \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Install ffmpeg and x264 using conda
-RUN conda install -y conda=24.9.2
-RUN conda install -y -c conda-forge ffmpeg x264
+# UVをインストールしてPATHを更新
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:$PATH"
 
-# Update pip and setuptools
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+# 仮想環境を作成
+RUN uv venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
-# Install Python dependencies
+# 依存関係ファイルを先にコピー（Docker キャッシュ最適化）
 COPY requirements_cu12.txt .
-RUN pip install -r requirements_cu12.txt --force-reinstall
-RUN pip install huggingface_hub==0.20.3
+COPY requirements_gradio_mini.txt .
 
-# Copy project files
+# UVで仮想環境にパッケージをインストール
+RUN uv pip install -r requirements_cu12.txt
+RUN uv pip install -r requirements_gradio_mini.txt
+RUN uv pip install huggingface_hub diffusers opencv-python
+
+# アプリケーションコードをコピー
 COPY . .
 
-# Specify runtime command
-# CMD ["python", "scripts/inference_long.py", "--config", "./configs/inference/long.yaml"]
+# 仮想環境のPythonを使用してアプリケーションを実行
+# CMD ["python", "app.py", "--server_name", "0.0.0.0", "--server_port", "7860"]
+
+# 仮想環境のPythonを使用してアプリケーションを実行
+# CMD ["python", "app.py", "--server_name", "0.0.0.0", "--server_port", "7860"]
+# Use uv to run the application
+# CMD ["uv", "run", "python", "app.py", "--server_name", "0.0.0.0", "--server_port", "7860"]
+# uv run python app.py --server_name 0.0.0.0 --server_port 7860

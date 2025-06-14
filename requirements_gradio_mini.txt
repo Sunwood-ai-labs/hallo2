@@ -1,0 +1,2 @@
+# Gradio WebUI用の追加依存関係
+gradio==4.36.1
