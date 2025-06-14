@@ -1,5 +1,5 @@
-version: '3.8'
 services:
+  # 従来のHallo2コマンドライン実行用
   hallo2:
     build:
       context: .
@@ -10,6 +10,29 @@ services:
       
     # command: python scripts/inference_long.py --config ./configs/inference/long.yaml
     tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+  
+  # Gradio WebUI用サービス
+  hallo2-webui:
+    build:
+      context: .
+      dockerfile: Dockerfile.cu12
+    volumes:
+      - .:/app
+      - ./.cache/huggingface:/root/.cache/huggingface
+      # - ./output_long:/app/output_long
+      # - ./hq_results:/app/hq_results
+    ports:
+      - "7865:7860"
+    # command: python app.py --server_name 0.0.0.0 --server_port 7860
+    tty: true
+    stdin_open: true
     deploy:
       resources:
         reservations:

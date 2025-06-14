@@ -24,7 +24,7 @@ from facelib.utils.misc import is_gray
 from basicsr.utils.registry import ARCH_REGISTRY
 
 
-def set_realesrgan():
+def set_realesrgan(bg_tile=400):
     from basicsr.archs.rrdbnet_arch import RRDBNet
     from basicsr.utils.realesrgan_utils import RealESRGANer
 
@@ -46,7 +46,7 @@ def set_realesrgan():
         scale=2,
         model_path="./pretrained_models/realesrgan/RealESRGAN_x2plus.pth",
         model=model,
-        tile=args.bg_tile,
+        tile=bg_tile,
         tile_pad=40,
         pre_pad=0,
         half=use_half
@@ -63,24 +63,66 @@ def set_realesrgan():
 
 
 
+def main(input_path, output_path=None, fidelity_weight=0.5, upscale=2,
+         has_aligned=False, only_center_face=False, draw_box=False,
+         detection_model='retinaface_resnet50', bg_upsampler='None',
+         face_upsample=False, bg_tile=400, suffix=None):
+    """
+    Video super resolution main function
+    
+    Args:
+        input_path (str): Input video path
+        output_path (str): Output folder path
+        fidelity_weight (float): Balance the quality and fidelity
+        upscale (int): The final upsampling scale of the image
+        has_aligned (bool): Input are cropped and aligned faces
+        only_center_face (bool): Only restore the center face
+        draw_box (bool): Draw the bounding box for the detected faces
+        detection_model (str): Face detector model
+        bg_upsampler (str): Background upsampler
+        face_upsample (bool): Face upsampler after enhancement
+        bg_tile (int): Tile size for background sampler
+        suffix (str): Suffix of the restored faces
+    """
+    device = get_device()
+    
+    # Create args object to maintain compatibility with existing code
+    class Args:
+        def __init__(self):
+            self.input_path = input_path
+            self.output_path = output_path
+            self.fidelity_weight = fidelity_weight
+            self.upscale = upscale
+            self.has_aligned = has_aligned
+            self.only_center_face = only_center_face
+            self.draw_box = draw_box
+            self.detection_model = detection_model
+            self.bg_upsampler = bg_upsampler
+            self.face_upsample = face_upsample
+            self.bg_tile = bg_tile
+            self.suffix = suffix
+    
+    args = Args()
+
+
 if __name__ == '__main__':
     # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     device = get_device()
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-i', '--input_path', type=str, help='Input video')
-    parser.add_argument('-o', '--output_path', type=str, default=None, 
+    parser.add_argument('-o', '--output_path', type=str, default=None,
             help='Output folder')
-    parser.add_argument('-w', '--fidelity_weight', type=float, default=0.5, 
+    parser.add_argument('-w', '--fidelity_weight', type=float, default=0.5,
             help='Balance the quality and fidelity. Default: 0.5')
-    parser.add_argument('-s', '--upscale', type=int, default=2, 
+    parser.add_argument('-s', '--upscale', type=int, default=2,
             help='The final upsampling scale of the image. Default: 2')
     parser.add_argument('--has_aligned', action='store_true', help='Input are cropped and aligned faces. Default: False')
     parser.add_argument('--only_center_face', action='store_true', help='Only restore the center face. Default: False')
     parser.add_argument('--draw_box', action='store_true', help='Draw the bounding box for the detected faces. Default: False')
     # large det_model: 'YOLOv5l', 'retinaface_resnet50'
     # small det_model: 'YOLOv5n', 'retinaface_mobile0.25'
-    parser.add_argument('--detection_model', type=str, default='retinaface_resnet50', 
+    parser.add_argument('--detection_model', type=str, default='retinaface_resnet50',
             help='Face detector. Optional: retinaface_resnet50, retinaface_mobile0.25, YOLOv5l, YOLOv5n. \
                 Default: retinaface_resnet50')
     parser.add_argument('--bg_upsampler', type=str, default='None', help='Background upsampler. Optional: realesrgan')
@@ -88,8 +130,36 @@ if __name__ == '__main__':
     parser.add_argument('--bg_tile', type=int, default=400, help='Tile size for background sampler. Default: 400')
     parser.add_argument('--suffix', type=str, default=None, help='Suffix of the restored faces. Default: None')
     
-    args = parser.parse_args()
+    parsed_args = parser.parse_args()
+    
+    # Call main function with parsed arguments
+    main(
+        input_path=parsed_args.input_path,
+        output_path=parsed_args.output_path,
+        fidelity_weight=parsed_args.fidelity_weight,
+        upscale=parsed_args.upscale,
+        has_aligned=parsed_args.has_aligned,
+        only_center_face=parsed_args.only_center_face,
+        draw_box=parsed_args.draw_box,
+        detection_model=parsed_args.detection_model,
+        bg_upsampler=parsed_args.bg_upsampler,
+        face_upsample=parsed_args.face_upsample,
+        bg_tile=parsed_args.bg_tile,
+        suffix=parsed_args.suffix
+    )
 
+
+def _execute_main_logic(args):
+    """Execute the main video super resolution logic"""
+    device = get_device()
+
+    return _execute_main_logic(args)
+
+
+def _execute_main_logic(args):
+    """Execute the main video super resolution logic"""
+    device = get_device()
+    
     # ------------------------ input & output ------------------------
     w = args.fidelity_weight
     input_video = False
@@ -102,12 +172,12 @@ if __name__ == '__main__':
             input_img_list.append(image)
             image = vidreader.get_frame()
         audio = vidreader.get_audio()
-        fps = vidreader.get_fps()    
+        fps = vidreader.get_fps()
         video_name = os.path.basename(args.input_path)[:-4]
         result_root = f'./hq_results/{video_name}_{w}_{args.upscale}'
         input_video = True
         vidreader.close()
-    else: 
+    else:
         raise RuntimeError("input should be mp4 file")
 
     if not args.output_path is None: # set output path
@@ -115,12 +185,12 @@ if __name__ == '__main__':
 
     test_img_num = len(input_img_list)
     if test_img_num == 0:
-        raise FileNotFoundError('No input image/video is found...\n' 
+        raise FileNotFoundError('No input image/video is found...\n'
             '\tNote that --input_path for video should end with .mp4|.mov|.avi')
 
     # ------------------ set up background upsampler ------------------
     if args.bg_upsampler == 'realesrgan':
-        bg_upsampler = set_realesrgan()
+        bg_upsampler = set_realesrgan(args.bg_tile)
     else:
         bg_upsampler = None
 
@@ -129,12 +199,12 @@ if __name__ == '__main__':
         if bg_upsampler is not None:
             face_upsampler = bg_upsampler
         else:
-            face_upsampler = set_realesrgan()
+            face_upsampler = set_realesrgan(args.bg_tile)
     else:
         face_upsampler = None
 
     # ------------------ set up CodeFormer restorer -------------------
-    net = ARCH_REGISTRY.get('CodeFormer')(dim_embd=512, codebook_size=1024, n_head=8, n_layers=9, 
+    net = ARCH_REGISTRY.get('CodeFormer')(dim_embd=512, codebook_size=1024, n_head=8, n_layers=9,
                                             connect_list=['32', '64', '128', '256']).to(device)
     
     ckpt_path = './pretrained_models/hallo2/net_g.pth'
@@ -148,9 +218,9 @@ if __name__ == '__main__':
     # ------------------ set up FaceRestoreHelper -------------------
     # large det_model: 'YOLOv5l', 'retinaface_resnet50'
     # small det_model: 'YOLOv5n', 'retinaface_mobile0.25'
-    if not args.has_aligned: 
+    if not args.has_aligned:
         print(f'Face detection model: {args.detection_model}')
-    if bg_upsampler is not None: 
+    if bg_upsampler is not None:
         print(f'Background upsampling: True, Face upsampling: {args.face_upsample}')
     else:
         print(f'Background upsampling: False, Face upsampling: {args.face_upsample}')
@@ -205,7 +275,7 @@ if __name__ == '__main__':
                 print(f'[{j+1}/{chunk}] Processing: {img_name}')
                 img = img_path
 
-            if args.has_aligned: 
+            if args.has_aligned:
                 # the input faces are already cropped and aligned
                 img = cv2.resize(img, (512, 512), interpolation=cv2.INTER_LINEAR)
                 face_helper.is_gray = is_gray(img, threshold=10)
@@ -219,7 +289,7 @@ if __name__ == '__main__':
                     only_center_face=args.only_center_face, resize=640, eye_dist_threshold=5)
                 print(f'\tdetect {num_det_faces} faces')
                 # align and warp each face
-                face_helper.align_warp_face()    
+                face_helper.align_warp_face()
 
         crop_image = []
         # face restoration for each cropped face
@@ -262,7 +332,7 @@ if __name__ == '__main__':
 
             face_helper.get_inverse_affine(None)
             # paste each restored face to the input image
-            if args.face_upsample and face_upsampler is not None: 
+            if args.face_upsample and face_upsampler is not None:
                 restored_img_list = face_helper.paste_faces_to_input_image(upsample_img_list=bg_img_list, draw_box=args.draw_box, face_upsampler=face_upsampler)
             else:
                 restored_img_list = face_helper.paste_faces_to_input_image(upsample_img_list=bg_img_list, draw_box=args.draw_box)
@@ -277,7 +347,7 @@ if __name__ == '__main__':
         if not args.has_aligned and len(restored_img_list)!=0:
             if args.suffix is not None:
                 basename = f'{video_name}_{args.suffix}_{i}'
-            for k, restored_img in enumerate(restored_img_list): 
+            for k, restored_img in enumerate(restored_img_list):
                 kk = str(k).zfill(3)
                 save_restore_path = os.path.join(result_root, 'final_results', f'{basename}_{kk}.png')
                 imwrite(restored_img, save_restore_path)
@@ -309,3 +379,4 @@ if __name__ == '__main__':
         vidwriter.close()
 
     print(f'\nAll results are saved in {result_root}')
+    return result_root

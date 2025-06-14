@@ -1,0 +1,54 @@
+# UV cache and virtual environments
+.cache/
+cache
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# UV specific
+.uv/
+uv.lock
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Model files (if large)
+models/
+weights/
+checkpoints/
+
+pretrained_models
+output_long
+
+# Output directories
+output/
+outputs/
+results/
