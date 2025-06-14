@@ -130,17 +130,16 @@ class Hallo2WebUI:
             output_video_path = os.path.join(self.temp_dir, "generated_video.mp4")
             video_segments = []
             
-            # セグメント動画ファイルを取得
+            # セグメント動画ディレクトリが存在し、動画ファイルがある場合
             if os.path.exists(save_seg_path):
-                for file in sorted(os.listdir(save_seg_path)):
-                    if file.endswith('.mp4'):
-                        video_segments.append(os.path.join(save_seg_path, file))
-            
-            if video_segments:
-                # 動画を結合
-                merge_videos_from_dir(video_segments, output_video_path, audio_path)
-                progress(1.0, desc="完了!")
-                return output_video_path, "✅ 顔アニメーションの生成が完了しました。"
+                video_files = [f for f in os.listdir(save_seg_path) if f.endswith('.mp4')]
+                if video_files:
+                    # 動画を結合（merge_videosは2つの引数のみ受け取る）
+                    merge_videos_from_dir(save_seg_path, output_video_path)
+                    progress(1.0, desc="完了!")
+                    return output_video_path, "✅ 顔アニメーションの生成が完了しました。"
+                else:
+                    return None, "❌ 生成された動画ファイルが見つかりません。"
             else:
                 return None, "❌ 動画の生成に失敗しました。"
                 

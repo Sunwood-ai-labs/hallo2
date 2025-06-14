@@ -30,7 +30,7 @@ COPY requirements_gradio_mini.txt .
 # UVで仮想環境にパッケージをインストール
 RUN uv pip install -r requirements_cu12.txt
 RUN uv pip install -r requirements_gradio_mini.txt
-RUN uv pip install huggingface_hub diffusers opencv-python
+# RUN uv pip install huggingface_hub diffusers opencv-python
 
 # アプリケーションコードをコピー
 COPY . .
