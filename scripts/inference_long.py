@@ -315,8 +315,9 @@ def inference_process(args: argparse.Namespace):
     face_locator.requires_grad_(False)
     audio_proj.requires_grad_(False)
 
-    reference_unet.enable_gradient_checkpointing()
-    denoising_unet.enable_gradient_checkpointing()
+    # NOTE: Gradient checkpointing is not needed during inference
+    # reference_unet.enable_gradient_checkpointing()
+    # denoising_unet.enable_gradient_checkpointing()
 
     net = Net(
         reference_unet,
