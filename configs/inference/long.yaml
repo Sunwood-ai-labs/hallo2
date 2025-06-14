@@ -1,5 +1,5 @@
-source_image: ./examples/reference_images/1.jpg
-driving_audio: ./examples/driving_audios/1.wav
+source_image: ./examples/reference_images/2.jpg
+driving_audio: ./examples/driving_audios/2.wav
 
 weight_dtype: fp16
 
