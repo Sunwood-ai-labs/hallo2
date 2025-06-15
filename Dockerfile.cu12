@@ -35,11 +35,8 @@ RUN uv pip install -r requirements_gradio_mini.txt
 # アプリケーションコードをコピー
 COPY . .
 
-# 仮想環境のPythonを使用してアプリケーションを実行
-# CMD ["python", "app.py", "--server_name", "0.0.0.0", "--server_port", "7860"]
+# ポートを公開
+EXPOSE 7860
 
 # 仮想環境のPythonを使用してアプリケーションを実行
-# CMD ["python", "app.py", "--server_name", "0.0.0.0", "--server_port", "7860"]
-# Use uv to run the application
-# CMD ["uv", "run", "python", "app.py", "--server_name", "0.0.0.0", "--server_port", "7860"]
-# uv run python app.py --server_name 0.0.0.0 --server_port 7860
+CMD ["python", "app.py", "--server_name", "0.0.0.0", "--server_port", "7860"]
