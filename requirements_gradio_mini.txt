@@ -1,0 +1,5 @@
+# Gradio WebUI用の追加依存関係
+# 互換性のあるバージョンを使用
+gradio==4.16.0
+pydantic==2.5.0
+fastapi==0.104.1

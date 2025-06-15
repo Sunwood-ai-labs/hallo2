@@ -1,5 +1,5 @@
-source_image: ./examples/reference_images/1.jpg
-driving_audio: ./examples/driving_audios/1.wav
+source_image: ./examples/reference_images/2.jpg
+driving_audio: ./examples/driving_audios/2.wav
 
 weight_dtype: fp16
 
@@ -24,6 +24,7 @@ use_cut: true
 audio_ckpt_dir: pretrained_models/hallo2
 
 
+# 生成された動画の保存先（タイムスタンプ付きのサブディレクトリが自動作成される）
 save_path: ./output_long/debug/
 cache_path: ./.cache
 

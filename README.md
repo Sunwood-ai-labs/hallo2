@@ -106,6 +106,54 @@ Besides, ffmpeg is also needed:
   apt-get install ffmpeg
 ```
 
+## 🐳 Docker デプロイメント
+
+### 📦 GitHub Container Registry から事前ビルド済みイメージを使用
+
+```bash
+# プロダクション環境での実行（推奨）
+docker run -p 7860:7860 --gpus all \
+  -v ./pretrained_models:/app/pretrained_models \
+  -v ./examples:/app/examples \
+  -v ./output_long:/app/output_long \
+  ghcr.io/sunwood-ai-labs/hallo2:latest
+```
+
+### 🏗️ ローカルでのDockerビルド
+
+```bash
+# Dockerイメージをビルド
+docker build -f Dockerfile.cu12 -t hallo2:local .
+
+# 実行
+docker run -p 7860:7860 --gpus all hallo2:local
+```
+
+### 🚀 Docker Compose を使用（推奨）
+
+```bash
+# 開発環境
+docker-compose up hallo2-webui
+
+# プロダクション環境（事前ビルド済みイメージ使用）
+docker-compose --profile production up hallo2-production
+```
+
+### 🔄 GitHub Actions CI/CD
+
+このプロジェクトには、GitHub Actionsを使用した自動的なDocker CI/CDパイプラインが含まれています：
+
+- **自動ビルド**: `main`または`master`ブランチへのプッシュ時
+- **マルチアーキテクチャサポート**: `linux/amd64`および`linux/arm64`
+- **GitHub Container Registry**: 自動的に`ghcr.io`にプッシュ
+- **タグ管理**: ブランチ名、セマンティックバージョン、Git SHAによる自動タグ付け
+
+#### 利用可能なイメージタグ:
+- `latest`: 最新の安定版
+- `main` / `master`: 最新の開発版
+- `v1.0.0`: セマンティックバージョンタグ
+- `git-abc1234`: 特定のコミットSHA
+
 ### 📥 Download Pretrained Models
 
 You can easily get all pretrained models required by inference from our [HuggingFace repo](https://huggingface.co/fudan-generative-ai/hallo2).

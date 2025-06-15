@@ -1,9 +1,11 @@
-version: '3.8'
 services:
+  # 従来のHallo2コマンドライン実行用
   hallo2:
     build:
       context: .
       dockerfile: Dockerfile.cu12
+    # Or use pre-built image from GitHub Container Registry
+    # image: ghcr.io/your-username/hallo2:latest
     volumes:
       - .:/app
       - ./.cache:/root/.cache
@@ -17,3 +19,52 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+  
+  # Gradio WebUI用サービス
+  hallo2-webui:
+    build:
+      context: .
+      dockerfile: Dockerfile.cu12
+    # Or use pre-built image from GitHub Container Registry
+    # image: ghcr.io/your-username/hallo2:latest
+    volumes:
+      - .:/app
+      - ./.cache/huggingface:/root/.cache/huggingface
+      # - ./output_long:/app/output_long
+      # - ./hq_results:/app/hq_results
+    ports:
+      - "7865:7860"
+    command: python app.py --server_name 0.0.0.0 --server_port 7860
+    tty: true
+    stdin_open: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # Pre-built image service (production ready)
+  hallo2-production:
+    # image: ghcr.io/your-username/hallo2:latest
+    image: ghcr.io/sunwood-ai-labs/hallo2:latest  # Replace with your actual repository
+    volumes:
+      - ./pretrained_models:/app/pretrained_models
+      - ./.cache/huggingface:/root/.cache/huggingface
+      - ./examples:/app/examples
+      - ./output_long:/app/output_long
+      - ./hq_results:/app/hq_results
+    ports:
+      - "7860:7860"
+    environment:
+      - PYTHONPATH=/app
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    profiles:
+      - production

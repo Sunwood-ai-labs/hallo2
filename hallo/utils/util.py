@@ -347,23 +347,68 @@ def tensor_to_video_batch(tensor, output_video_file, start, audio_source, fps=25
     new_video_clip.write_videofile(output_video_file, fps=fps, audio_codec='aac')
 
 def merge_videos(input_directory, output_file):
-    video_files = [f for f in os.listdir(input_directory) if f.endswith('.mp4')]
+    """
+    セグメント動画ディレクトリから動画ファイルを結合する
     
-    video_files.sort()  
-
-    clips = []
+    Args:
+        input_directory: セグメント動画が保存されているディレクトリ
+        output_file: 出力動画ファイルのパス
+    """
+    import re
+    import logging
     
-    for video_file in video_files:
-        file_path = os.path.join(input_directory, video_file)
-        clip = VideoFileClip(file_path)
-        clips.append(clip)
+    logger = logging.getLogger(__name__)
+    
+    try:
+        # MP4ファイルのみを取得
+        video_files = [f for f in os.listdir(input_directory) if f.endswith('.mp4')]
+        
+        if not video_files:
+            logger.error(f"動画ファイルが見つかりません: {input_directory}")
+            return
+        
+        # ファイル名に含まれる数字でソート（例: name-000001.mp4, name-000002.mp4）
+        def extract_number(filename):
+            # ファイル名から数字を抽出
+            numbers = re.findall(r'\d+', filename)
+            return int(numbers[-1]) if numbers else 0
+        
+        video_files.sort(key=extract_number)
+        logger.info(f"ソート後の動画ファイル: {video_files}")
 
-    final_clip = concatenate_videoclips(clips)
+        clips = []
+        
+        for video_file in video_files:
+            file_path = os.path.join(input_directory, video_file)
+            logger.info(f"動画ファイルを読み込み中: {file_path}")
+            try:
+                clip = VideoFileClip(file_path)
+                clips.append(clip)
+            except Exception as e:
+                logger.error(f"動画ファイルの読み込みに失敗: {file_path}, エラー: {e}")
+                continue
 
-    final_clip.write_videofile(output_file, codec="libx264")
+        if not clips:
+            logger.error("有効な動画クリップが見つかりません")
+            return
+        
+        logger.info(f"{len(clips)}個の動画クリップを結合中...")
+        final_clip = concatenate_videoclips(clips)
 
-    for clip in clips:
-        clip.close()
+        # 出力ディレクトリを作成
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
+        
+        final_clip.write_videofile(output_file, codec="libx264", verbose=False, logger=None)
+        logger.info(f"動画の結合が完了: {output_file}")
+
+        # クリップを解放
+        final_clip.close()
+        for clip in clips:
+            clip.close()
+            
+    except Exception as e:
+        logger.error(f"動画結合中にエラーが発生: {e}")
+        raise
 
 
 silhouette_ids = [
