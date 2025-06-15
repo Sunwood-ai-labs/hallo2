@@ -31,6 +31,11 @@
     <a href='https://openbayes.com/console/public/tutorials/8KOlYWsdiY4'><img src='https://img.shields.io/badge/Demo-OpenBayes贝式计算-orange'></a>
     <a href='assets/wechat.jpeg'><img src='https://badges.aleen42.com/src/wechat.svg'></a>
 </div>
+
+<div align='center'>
+    <strong>🇺🇸 English</strong> | <a href='README_ja.md'>🇯🇵 日本語</a>
+</div>
+
 <br>
 
 ## 📸 Showcase
@@ -82,36 +87,36 @@ Visit our [project page](https://fudan-generative-vision.github.io/hallo2/#/) to
 Download the codes:
 
 ```bash
-  git clone https://github.com/fudan-generative-vision/hallo2
-  cd hallo2
+git clone https://github.com/fudan-generative-vision/hallo2
+cd hallo2
 ```
 
 Create conda environment:
 
 ```bash
-  conda create -n hallo python=3.10
-  conda activate hallo
+conda create -n hallo python=3.10
+conda activate hallo
 ```
 
 Install packages with `pip`
 
 ```bash
-  pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2 --index-url https://download.pytorch.org/whl/cu118
-  pip install -r requirements.txt
+pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2 --index-url https://download.pytorch.org/whl/cu118
+pip install -r requirements.txt
 ```
 
 Besides, ffmpeg is also needed:
 
 ```bash
-  apt-get install ffmpeg
+apt-get install ffmpeg
 ```
 
-## 🐳 Docker デプロイメント
+## 🐳 Docker Deployment
 
-### 📦 GitHub Container Registry から事前ビルド済みイメージを使用
+### 📦 Using Pre-built Images from GitHub Container Registry
 
 ```bash
-# プロダクション環境での実行（推奨）
+# Run in production environment (recommended)
 docker run -p 7860:7860 --gpus all \
   -v ./pretrained_models:/app/pretrained_models \
   -v ./examples:/app/examples \
@@ -119,42 +124,42 @@ docker run -p 7860:7860 --gpus all \
   ghcr.io/sunwood-ai-labs/hallo2:latest
 ```
 
-### 🏗️ ローカルでのDockerビルド
+### 🏗️ Local Docker Build
 
 ```bash
-# Dockerイメージをビルド
+# Build Docker image
 docker build -f Dockerfile.cu12 -t hallo2:local .
 
-# 実行
+# Run
 docker run -p 7860:7860 --gpus all hallo2:local
 ```
 
-### 🚀 Docker Compose を使用（推奨）
+### 🚀 Using Docker Compose (Recommended)
 
 ```bash
-# 開発環境
+# Development environment
 docker-compose up hallo2-webui
 
-# プロダクション環境（事前ビルド済みイメージ使用）
+# Production environment (using pre-built images)
 docker-compose --profile production up hallo2-production
 ```
 
 ### 🔄 GitHub Actions CI/CD
 
-このプロジェクトには、GitHub Actionsを使用した自動的なDocker CI/CDパイプラインが含まれています：
+This project includes an automated Docker CI/CD pipeline using GitHub Actions:
 
-- **自動ビルド**: `main`または`master`ブランチへのプッシュ時
-- **マルチアーキテクチャサポート**: `linux/amd64`および`linux/arm64`
-- **GitHub Container Registry**: 自動的に`ghcr.io`にプッシュ
-- **タグ管理**: ブランチ名、セマンティックバージョン、Git SHAによる自動タグ付け
+- **Automatic Build**: Triggered on push to `main` or `master` branch
+- **Multi-architecture Support**: `linux/amd64` and `linux/arm64`
+- **GitHub Container Registry**: Automatically pushes to `ghcr.io`
+- **Tag Management**: Automatic tagging by branch name, semantic version, and Git SHA
 
-#### 利用可能なイメージタグ:
-- `latest`: 最新の安定版
-- `main` / `master`: 最新の開発版
-- `v1.0.0`: セマンティックバージョンタグ
-- `git-abc1234`: 特定のコミットSHA
+#### Available Image Tags:
+- `latest`: Latest stable version
+- `main` / `master`: Latest development version
+- `v1.0.0`: Semantic version tags
+- `git-abc1234`: Specific commit SHA
 
-### 📥 Download Pretrained Models
+## 📥 Download Pretrained Models
 
 You can easily get all pretrained models required by inference from our [HuggingFace repo](https://huggingface.co/fudan-generative-ai/hallo2).
 
@@ -169,12 +174,12 @@ huggingface-cli download fudan-generative-ai/hallo2 --local-dir ./pretrained_mod
 Or you can download them separately from their source repo:
 
 - [hallo](https://huggingface.co/fudan-generative-ai/hallo2/tree/main/hallo2): Our checkpoints consist of denoising UNet, face locator, image & audio proj.
-- [audio_separator](https://huggingface.co/huangjackson/Kim_Vocal_2): Kim*Vocal_2 MDX-Net vocal removal model. (\_Thanks to [KimberleyJensen](https://github.com/KimberleyJensen)*)
-- [insightface](https://github.com/deepinsight/insightface/tree/master/python-package#model-zoo): 2D and 3D Face Analysis placed into `pretrained_models/face_analysis/models/`. (_Thanks to deepinsight_)
+- [audio_separator](https://huggingface.co/huangjackson/Kim_Vocal_2): Kim*Vocal_2 MDX-Net vocal removal model. (Thanks to [KimberleyJensen](https://github.com/KimberleyJensen))
+- [insightface](https://github.com/deepinsight/insightface/tree/master/python-package#model-zoo): 2D and 3D Face Analysis placed into `pretrained_models/face_analysis/models/`. (Thanks to deepinsight)
 - [face landmarker](https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task): Face detection & mesh model from [mediapipe](https://ai.google.dev/edge/mediapipe/solutions/vision/face_landmarker#models) placed into `pretrained_models/face_analysis/models`.
-- [motion module](https://github.com/guoyww/AnimateDiff/blob/main/README.md#202309-animatediff-v2): motion module from [AnimateDiff](https://github.com/guoyww/AnimateDiff). (_Thanks to [guoyww](https://github.com/guoyww)_).
-- [sd-vae-ft-mse](https://huggingface.co/stabilityai/sd-vae-ft-mse): Weights are intended to be used with the diffusers library. (_Thanks to [stablilityai](https://huggingface.co/stabilityai)_)
-- [StableDiffusion V1.5](https://huggingface.co/runwayml/stable-diffusion-v1-5): Initialized and fine-tuned from Stable-Diffusion-v1-2. (_Thanks to [runwayml](https://huggingface.co/runwayml)_)
+- [motion module](https://github.com/guoyww/AnimateDiff/blob/main/README.md#202309-animatediff-v2): motion module from [AnimateDiff](https://github.com/guoyww/AnimateDiff). (Thanks to [guoyww](https://github.com/guoyww)).
+- [sd-vae-ft-mse](https://huggingface.co/stabilityai/sd-vae-ft-mse): Weights are intended to be used with the diffusers library. (Thanks to [stablilityai](https://huggingface.co/stabilityai))
+- [StableDiffusion V1.5](https://huggingface.co/runwayml/stable-diffusion-v1-5): Initialized and fine-tuned from Stable-Diffusion-v1-2. (Thanks to [runwayml](https://huggingface.co/runwayml))
 - [wav2vec](https://huggingface.co/facebook/wav2vec2-base-960h): wav audio to vector model from [Facebook](https://huggingface.co/facebook/wav2vec2-base-960h).
 - [facelib](https://github.com/sczhou/CodeFormer/releases/tag/v0.1.0): pretrained face parse models
 - [realesrgan](https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/RealESRGAN_x2plus.pth): background upsample model
@@ -231,7 +236,7 @@ Finally, these pretrained models should be organized as follows:
         `-- vocab.json
 ```
 
-### 🛠️ Prepare Inference Data
+## 🛠️ Prepare Inference Data
 
 Hallo has a few simple requirements for input data:
 
@@ -249,9 +254,29 @@ For the driving audio:
 
 We have provided [some samples](examples/) for your reference.
 
-### 🎮 Run Inference
+## 🎮 Run WebUI
 
-#### Long-Duration animation
+You can easily run Hallo2 using the web interface:
+
+```bash
+python app.py
+```
+
+Access the WebUI at `http://localhost:7860` in your browser.
+
+### Optional arguments:
+
+```bash
+python app.py --server_name 0.0.0.0 --server_port 7860 --share
+```
+
+- `--server_name`: Server hostname (default: 0.0.0.0)
+- `--server_port`: Server port (default: 7860)
+- `--share`: Generate Gradio share link
+
+## 🎮 Run Inference
+
+### Long-Duration animation
 
 Simply to run the `scripts/inference_long.py` and change `source_image`, `driving_audio` and `save_path` in the config file:
 
@@ -284,7 +309,7 @@ options:
                         face region
 ```
 
-#### High-Resolution animation
+### High-Resolution animation
 
 Simply to run the `scripts/video_sr.py` and pass `input_video` and `output_path`:
 
@@ -324,7 +349,7 @@ options:
 
 > NOTICE: The High-Resolution animation feature is a modified version of [CodeFormer](https://github.com/sczhou/CodeFormer). When using or redistributing this feature, please comply with the [S-Lab License 1.0](https://github.com/sczhou/CodeFormer?tab=License-1-ov-file). We kindly request that you respect the terms of this license in any usage or redistribution of this component.
 
-## &#x1F525;Training
+## 🔥 Training
 
 ### Long-Duration animation
 
